@@ -1,6 +1,7 @@
 using Livekit.Server.Sdk.Dotnet;
 using LiveKitApp.Backend;
 using LiveKitApp.Backend.EndPoints;
+using LiveKitApp.Backend.Services;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,8 @@ builder.Services.AddSingleton<RoomServiceClient>(serviceProvider => {
         apiSecret:options.ApiSecret
     );
 });
+
+builder.Services.AddSingleton<TokenFactory>();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

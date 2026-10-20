@@ -1,1 +1,3 @@
-﻿record RoomDetailsToShow(string sid, string name, uint numParticipant);
+﻿namespace LiveKitApp.Backend.Contracts;
+
+record RoomDetailsToShow(string Sid, string Name, uint NumParticipant);
