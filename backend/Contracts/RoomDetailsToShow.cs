@@ -1,0 +1,1 @@
+﻿record RoomDetailsToShow(string sid, string name, uint numParticipant);
