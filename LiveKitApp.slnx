@@ -1,5 +1,10 @@
-<Solution>
+﻿<Solution>
   <Folder Name="/backend/">
     <Project Path="backend/LiveKitApp.Backend.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".env" />
+    <File Path=".env.example" />
+    <File Path="compose.yaml" />
   </Folder>
 </Solution>

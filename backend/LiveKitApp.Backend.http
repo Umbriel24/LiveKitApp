@@ -1,6 +1,9 @@
-@LiveKitApp.Backend_HostAddress = http://localhost:5250
+@host = http://localhost:5250
 
-GET {{LiveKitApp.Backend_HostAddress}}/weatherforecast/
+### Crei un token con identity Alice
+GET {{host}}/token?room=test&identity=alice
 Accept: application/json
 
-###
+### Get di tutte le stanze
+GET {{host}}/rooms
+Accept: application/json

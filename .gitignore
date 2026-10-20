@@ -26,8 +26,10 @@ unity/*.sln
 .idea/
 .vscode/
 .DS_Store
-*.md
 
 # Livekit
 livekit.dev.local
 livekit.myhost.com
+
+# Altro
+docs
