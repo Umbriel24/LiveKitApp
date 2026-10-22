@@ -7,3 +7,12 @@ Accept: application/json
 ### Get di tutte le stanze
 GET {{host}}/rooms
 Accept: application/json
+
+### Crea una lobby (come farebbe Unity)
+POST {{host}}/rooms
+Content-Type: application/json
+
+{
+  "userId": "unity-user-1",
+  "displayName": "Mario"
+}
