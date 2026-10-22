@@ -4,21 +4,36 @@ import { RoomStage } from './components/RoomStage';
 import { RoomDetails, TokenResponse } from './types/livekit';
 import { fetchRooms, fetchToken } from './services/api';
 
-const STORAGE_KEY_IDENTITY = 'livekit_identity';
+// Il nickname è salvato tra le sessioni (stessa chiave di prima, per non perdere quelli già scelti)
+const STORAGE_KEY_DISPLAY_NAME = 'livekit_identity';
 
-function getInitialIdentity(): string {
-  const saved = localStorage.getItem(STORAGE_KEY_IDENTITY);
+// Identity LiveKit: deve essere univoca nella stanza, altrimenti il partecipante precedente
+// con la stessa identity viene espulso. Generata a ogni caricamento della pagina, quindi
+// ogni tab ha la sua. crypto.randomUUID() esiste solo in contesti sicuri (HTTPS o localhost),
+// per questo c'è il fallback su getRandomValues (es. accesso da un altro PC in LAN via http).
+function generateParticipantId(): string {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+const PARTICIPANT_ID = generateParticipantId();
+
+function getInitialDisplayName(): string {
+  const saved = localStorage.getItem(STORAGE_KEY_DISPLAY_NAME);
   if (saved && saved.trim().length > 0) {
     return saved.trim();
   }
   const randomSuffix = Math.floor(1000 + Math.random() * 9000);
   const generated = `WebUser-${randomSuffix}`;
-  localStorage.setItem(STORAGE_KEY_IDENTITY, generated);
+  localStorage.setItem(STORAGE_KEY_DISPLAY_NAME, generated);
   return generated;
 }
 
 export function App() {
-  const [identity, setIdentity] = useState<string>(getInitialIdentity);
+  const [displayName, setDisplayName] = useState<string>(getInitialDisplayName);
   const [rooms, setRooms] = useState<RoomDetails[]>([]);
   const [isLoadingRooms, setIsLoadingRooms] = useState<boolean>(false);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
@@ -68,7 +83,7 @@ export function App() {
     setConnectionDetails(null);
 
     try {
-      const tokenData = await fetchToken(roomName, identity);
+      const tokenData = await fetchToken(roomName, PARTICIPANT_ID, displayName);
       setConnectionDetails(tokenData);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Errore sconosciuto durante la connessione.';
@@ -89,11 +104,11 @@ export function App() {
   };
 
   // Aggiornamento nickname
-  const handleUpdateIdentity = (newIdentity: string) => {
-    const trimmed = newIdentity.trim();
+  const handleUpdateIdentity = (newDisplayName: string) => {
+    const trimmed = newDisplayName.trim();
     if (trimmed.length > 0) {
-      setIdentity(trimmed);
-      localStorage.setItem(STORAGE_KEY_IDENTITY, trimmed);
+      setDisplayName(trimmed);
+      localStorage.setItem(STORAGE_KEY_DISPLAY_NAME, trimmed);
     }
   };
 
@@ -103,7 +118,7 @@ export function App() {
         rooms={rooms}
         isLoading={isLoadingRooms}
         selectedRoom={selectedRoom}
-        identity={identity}
+        identity={displayName}
         onSelectRoom={handleSelectRoom}
         onRefresh={() => loadRooms(true)}
         onUpdateIdentity={handleUpdateIdentity}

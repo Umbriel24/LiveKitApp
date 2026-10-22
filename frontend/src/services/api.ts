@@ -22,12 +22,14 @@ export async function fetchRooms(): Promise<RoomDetails[]> {
 }
 
 /**
- * Richiede al backend un token JWT di accesso LiveKit per una stanza e un'identità specifica
+ * Richiede al backend un token JWT di accesso LiveKit per una stanza.
+ * `identity` è l'ID univoco del partecipante, `name` il nickname mostrato agli altri.
  */
-export async function fetchToken(room: string, identity: string): Promise<TokenResponse> {
+export async function fetchToken(room: string, identity: string, name: string): Promise<TokenResponse> {
   const params = new URLSearchParams({
     room,
     identity,
+    name,
   });
 
   const response = await fetch(`${API_BASE_URL}/token?${params.toString()}`, {
