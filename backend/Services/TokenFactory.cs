@@ -13,18 +13,18 @@ public class TokenFactory {
     }
 
     //Token con publish di audio e video
-    public TokenResult CreateHostToken(string identity, string room) {
-        return CreateToken(identity, room, new List<string> { "microphone", "screen_share" });
+    public TokenResult CreateHostToken(string identity, string room, string name) {
+        return CreateToken(identity, room, name, new List<string> { "microphone", "screen_share" });
     }
     
     //Token con publish del solo audio
-    public TokenResult CreateViewerToken(string identity, string room) {
-        return CreateToken(identity, room, new List<string> {"microphone"});
+    public TokenResult CreateViewerToken(string identity, string room, string name) {
+        return CreateToken(identity, room, name, new List<string> {"microphone"});
     }
 
-    private TokenResult CreateToken(string identity, string room, List<string> sources) {
+    private TokenResult CreateToken(string identity, string room, string name, List<string> sources) {
         var token = new AccessToken(_options.ApiKey, _options.ApiSecret)
-            .WithName(identity)
+            .WithName(name)
             .WithIdentity(identity)
             .WithGrants(new VideoGrants {
                 CanSubscribe = true,
