@@ -1,10 +1,12 @@
 ﻿using Livekit.Server.Sdk.Dotnet;
+using LiveKitApp.Backend.Contracts;
 
 namespace LiveKitApp.Backend.EndPoints;
 
 public static class RoomEndpoints {
     
     public static void MapRoomEndpoints(this IEndpointRouteBuilder app) {
+        
         app.MapGet("/rooms", async (RoomServiceClient client) => {
 
 
@@ -21,5 +23,7 @@ public static class RoomEndpoints {
             ];
             return Results.Ok(roomList);
         });
+
+        app.MapPost("/rooms", () => { });
     }
 }

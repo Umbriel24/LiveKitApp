@@ -2,7 +2,7 @@
 
 namespace LiveKitApp.Backend;
 
-public class LiveKitOptions() {
+public class LiveKitOptions {
     
     public const string SectionName = "livekit";
     
