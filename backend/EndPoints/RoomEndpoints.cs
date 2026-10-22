@@ -50,7 +50,7 @@ public static class RoomEndpoints {
                 name: request.DisplayName
             );
             
-            return Results.Ok(connection);
+            return Results.Ok(new CreateLobbyResponse(roomNameGuid, connection));
         });
     }
 }

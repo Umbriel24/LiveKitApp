@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RefreshCw, Users, Hash, Volume2, User, Edit3, Check, Radio } from 'lucide-react';
+import { RefreshCw, Users, Hash, Volume2, User, Edit3, Check, Radio, MonitorUp } from 'lucide-react';
 import { RoomDetails } from '../types/livekit';
 
 interface SidebarProps {
@@ -10,6 +10,8 @@ interface SidebarProps {
   onSelectRoom: (roomName: string) => void;
   onRefresh: () => void;
   onUpdateIdentity: (newIdentity: string) => void;
+  onCreateLobby: () => void;
+  isCreatingLobby: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -20,6 +22,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectRoom,
   onRefresh,
   onUpdateIdentity,
+  onCreateLobby,
+  isCreatingLobby,
 }) => {
   const [isEditingIdentity, setIsEditingIdentity] = useState(false);
   const [inputIdentity, setInputIdentity] = useState(identity);
@@ -64,6 +68,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           disabled={isLoading}
         >
           <RefreshCw size={17} />
+        </button>
+      </div>
+
+      {/* Crea una lobby come host: simula il client Unity (POST /rooms, token con screen_share) */}
+      <div className="create-lobby-container">
+        <button
+          className="create-lobby-btn"
+          onClick={onCreateLobby}
+          disabled={isCreatingLobby}
+          title="Crea una lobby e condividi lo schermo (simula Unity)"
+        >
+          <MonitorUp size={16} />
+          <span>{isCreatingLobby ? 'Creazione…' : 'Crea lobby (host)'}</span>
         </button>
       </div>
 

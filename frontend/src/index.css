@@ -122,6 +122,37 @@ body,
   }
 }
 
+/* Pulsante "Crea lobby (host)" */
+.create-lobby-container {
+  padding: 12px 8px 4px;
+}
+
+.create-lobby-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--discord-blurple);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.create-lobby-btn:hover:not(:disabled) {
+  background-color: var(--discord-blurple-hover);
+}
+
+.create-lobby-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 /* Channels List */
 .channels-section {
   flex: 1;

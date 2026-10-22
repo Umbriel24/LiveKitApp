@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { RoomStage } from './components/RoomStage';
 import { RoomDetails, TokenResponse } from './types/livekit';
-import { fetchRooms, fetchToken } from './services/api';
+import { createLobby, fetchRooms, fetchToken } from './services/api';
 
 // Il nickname è salvato tra le sessioni (stessa chiave di prima, per non perdere quelli già scelti)
 const STORAGE_KEY_DISPLAY_NAME = 'livekit_identity';
@@ -40,6 +40,7 @@ export function App() {
   const [connectionDetails, setConnectionDetails] = useState<TokenResponse | null>(null);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [isCreatingLobby, setIsCreatingLobby] = useState<boolean>(false);
 
   // Caricamento stanze dal backend
   const loadRooms = useCallback(async (manual = false) => {
@@ -93,6 +94,26 @@ export function App() {
     }
   };
 
+  // Creazione lobby come host (stesso flusso di Unity): il token restituito permette lo screen share
+  const handleCreateLobby = async () => {
+    setIsCreatingLobby(true);
+    setConnectionError(null);
+    setConnectionDetails(null);
+
+    try {
+      const lobby = await createLobby(PARTICIPANT_ID, displayName);
+      setSelectedRoom(lobby.roomName);
+      setConnectionDetails(lobby.connection);
+      loadRooms(false);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Errore sconosciuto durante la creazione della lobby.';
+      setSelectedRoom('nuova lobby');
+      setConnectionError(message);
+    } finally {
+      setIsCreatingLobby(false);
+    }
+  };
+
   // Disconnessione
   const handleDisconnect = () => {
     setSelectedRoom(null);
@@ -122,6 +143,8 @@ export function App() {
         onSelectRoom={handleSelectRoom}
         onRefresh={() => loadRooms(true)}
         onUpdateIdentity={handleUpdateIdentity}
+        onCreateLobby={handleCreateLobby}
+        isCreatingLobby={isCreatingLobby}
       />
       <RoomStage
         selectedRoom={selectedRoom}

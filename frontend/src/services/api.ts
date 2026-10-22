@@ -1,4 +1,4 @@
-import { RoomDetails, TokenResponse } from '../types/livekit';
+import { CreateLobbyResponse, RoomDetails, TokenResponse } from '../types/livekit';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5250';
 
@@ -44,5 +44,27 @@ export async function fetchToken(room: string, identity: string, name: string): 
   }
 
   const data: TokenResponse = await response.json();
+  return data;
+}
+
+/**
+ * Crea una lobby come host (lo stesso flusso che userà Unity): il backend crea la stanza
+ * e restituisce un token con permesso di condividere lo schermo.
+ */
+export async function createLobby(userId: string, displayName: string): Promise<CreateLobbyResponse> {
+  const response = await fetch(`${API_BASE_URL}/rooms`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({ userId, displayName }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Errore durante la creazione della lobby: ${response.status} ${response.statusText}`);
+  }
+
+  const data: CreateLobbyResponse = await response.json();
   return data;
 }
