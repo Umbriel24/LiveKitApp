@@ -12,15 +12,15 @@ node_modules/
 dist/
 
 # Unity
-unity/[Ll]ibrary/
-unity/[Tt]emp/
-unity/[Oo]bj/
-unity/[Bb]uild/
-unity/[Bb]uilds/
-unity/[Ll]ogs/
-unity/[Uu]ser[Ss]ettings/
-unity/*.csproj
-unity/*.sln
+Unity/Demo-Livekit/Library
+Unity/Demo-Livekit/Temp/
+Unity/Demo-Livekit/[Oo]bj/
+Unity/Demo-Livekit/[Bb]uild/
+Unity/Demo-Livekit/[Bb]uilds/
+Unity/Demo-Livekit/Logs/
+Unity/Demo-Livekit/[Uu]ser[Ss]ettings/
+Unity/Demo-Livekit/*.csproj
+Unity/Demo-Livekit/*.sln
 
 # IDE / OS
 .idea/
