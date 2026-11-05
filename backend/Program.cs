@@ -1,7 +1,10 @@
 using Livekit.Server.Sdk.Dotnet;
 using LiveKitApp.Backend;
+using LiveKitApp.Backend.Database;
 using LiveKitApp.Backend.EndPoints;
 using LiveKitApp.Backend.Services;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +23,15 @@ builder.Services.AddSingleton<RoomServiceClient>(serviceProvider => {
         apiKey:options.ApiKey,
         apiSecret:options.ApiSecret
     );
+});
+
+var csb = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("DefaultConnection"))
+{
+    Password = builder.Configuration["DatabasePassword"] ?? throw new InvalidOperationException("Database password not set")
+};
+
+builder.Services.AddDbContext<AppDbContext>(options => {
+    options.UseSqlServer(csb.ConnectionString);
 });
 
 builder.Services.AddSingleton<TokenFactory>();
