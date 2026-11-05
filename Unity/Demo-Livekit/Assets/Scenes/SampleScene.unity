@@ -148,8 +148,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc27619e4a7692d47bac0d583d01743f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LobbyHost
-  backendUrl: http://localhost:5250
-  userId: 
+  backendUrl: http://10.10.10.116:5250
+  livekitUrlOverride: ws://10.10.10.116:7880
+  userId:
   displayName: 
   connectOnStart: 1
 --- !u!4 &96290251

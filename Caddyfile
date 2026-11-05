@@ -1,0 +1,22 @@
+{
+	# Collegandosi tramite IP il browser non invia il nome del server (SNI)
+	default_sni 10.10.10.116
+}
+
+# Frontend
+https://10.10.10.116 {
+	tls internal
+	reverse_proxy frontend:80
+}
+
+# Backend
+https://10.10.10.116:8443 {
+	tls internal
+	reverse_proxy backend:8080
+}
+
+# LiveKit signaling (wss)
+https://10.10.10.116:7443 {
+	tls internal
+	reverse_proxy livekit:7880
+}

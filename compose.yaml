@@ -7,7 +7,7 @@
       # Assegna la porta UDP fissa per WebRTC (corrispondente al port mapping)
       UDP_PORT: 7882
       # IP annunciato ai client per i candidati ICE (127.0.0.1 è il loopback di default: localhost su Windows)
-      NODE_IP: 127.0.0.1
+      NODE_IP: ${NODE_IP:-127.0.0.1}
       # Carica da .env con fallback opzionali per evitare crash se .env manca
       LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:-EXAMPLEAPIRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR}"
     ports:
@@ -37,7 +37,7 @@
     build:
       context: ./frontend
       args:
-        VITE_API_URL: http://localhost:5250   # URL pubblico: lo usa il browser, non il container
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5250}   # URL pubblico: lo usa il browser, non il container
     ports:
       - "5173:80"
     depends_on:
@@ -55,7 +55,23 @@
     ports:
       - "${MSSQL_PORT:-1433}:1433"
     restart: unless-stopped
-    
+
+  # HTTPS per il browser: parte solo con "docker compose --profile vm up"
+  caddy:
+    image: caddy:2
+    profiles: [vm]
+    ports:
+      - "443:443"
+      - "8443:8443"
+      - "7443:7443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data   # conserva la CA interna: il certificato resta uguale tra i riavvii
+    depends_on:
+      - frontend
+      - backend
+      - livekit
+
 volumes:
   volumeDatabase:
-    
+  caddy_data:

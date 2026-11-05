@@ -4,6 +4,9 @@ using LiveKit;
 using LiveKit.Proto;
 using UnityEngine;
 using RoomOptions = LiveKit.RoomOptions;
+#if UNITY_ANDROID && !UNITY_EDITOR
+using UnityEngine.Android;
+#endif
 
 //Host della lobby: crea la stanza tramite il backend, ci entra,
 //pubblica schermo del gioco + microfono e riproduce l'audio dell'operatore dal browser.
@@ -11,6 +14,8 @@ public class LobbyHost : MonoBehaviour {
 
     [Header("Backend")]
     [SerializeField] private string backendUrl = "http://localhost:5250";
+    [Tooltip("Vuoto = usa l'URL restituito dal backend. Il visore lo imposta per collegarsi a LiveKit senza passare da Caddy.")]
+    [SerializeField] private string livekitUrlOverride;
 
     [Header("Identità (vuoto = GUID generato all'avvio)")]
     [SerializeField] private string userId;
@@ -53,19 +58,46 @@ public class LobbyHost : MonoBehaviour {
         _room.TrackSubscribed += OnTrackSubscribed;
         _room.Disconnected += OnDisconnected;
 
-        var connect = _room.Connect(lobby.connection.url, lobby.connection.token, new RoomOptions());
+        var livekitUrl = string.IsNullOrWhiteSpace(livekitUrlOverride) ? lobby.connection.url : livekitUrlOverride;
+        var connect = _room.Connect(livekitUrl, lobby.connection.token, new RoomOptions());
         yield return connect;
 
         if (connect.IsError) {
-            Debug.LogError($"[LobbyHost] Connessione a {lobby.connection.url} fallita");
+            Debug.LogError($"[LobbyHost] Connessione a {livekitUrl} fallita");
             _room = null;
             yield break;
         }
         Debug.Log($"[LobbyHost] Connesso alla stanza {_room.Name}");
 
         //3. Microfono e 4. schermo
+        yield return EnsureMicrophonePermission();
         yield return PublishMicrophone();
         yield return PublishScreen();
+    }
+
+    //Su Android il permesso va chiesto a runtime, prima di usare il microfono
+    private IEnumerator EnsureMicrophonePermission() {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        //Il riferimento a Microphone fa inserire a Unity RECORD_AUDIO nel manifest:
+        //PlatformAudio è nativo e Unity potrebbe non rilevarlo da solo
+        Debug.Log($"[LobbyHost] Microfoni disponibili: {Microphone.devices.Length}");
+
+        if (Permission.HasUserAuthorizedPermission(Permission.Microphone)) yield break;
+        Permission.RequestUserPermission(Permission.Microphone);
+
+        const float timeoutSeconds = 30f;
+        var deadline = Time.realtimeSinceStartup + timeoutSeconds;
+        while (!Permission.HasUserAuthorizedPermission(Permission.Microphone)
+               && Time.realtimeSinceStartup < deadline) {
+            yield return null;
+        }
+
+        if (!Permission.HasUserAuthorizedPermission(Permission.Microphone)) {
+            Debug.LogWarning("[LobbyHost] Permesso microfono non concesso");
+        }
+#else
+        yield break;
+#endif
     }
 
     private IEnumerator PublishMicrophone() {
